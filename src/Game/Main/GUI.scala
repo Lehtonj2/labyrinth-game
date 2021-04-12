@@ -1,4 +1,4 @@
-package Main
+package Game.Main
 
 import scalafx.application.JFXApp
 
