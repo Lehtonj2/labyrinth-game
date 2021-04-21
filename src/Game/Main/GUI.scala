@@ -24,14 +24,16 @@ object Main extends JFXApp {
     stage.scene = scene
 
     val grid = new Grid(10, 10)
-
+    val gridLocations = grid.locations
     val labyrinth = new Labyrinth
     val floors = labyrinth.createLabyrinth(grid)
+    val walls = new Grid((grid.width * 3) - 1, (grid.height * 3) - 1).locations.filter(n => !floors.map(_.location).contains(n)).map(n => new Wall(n._1, n._2, false))
     val floorRectangles = Buffer[Rectangle]()
+    val wallRectangles = Buffer[Rectangle]()
     for (i <- floors) {
     val rectangle = new Rectangle {
-    x = i._1 * 15
-    y = i._2 * 15
+    x = i.location._1 * 10
+    y = i.location._2 * 10
     width = 10
     height = 10
     fill = Blue //scalafx.scene.paint.Color
@@ -39,7 +41,20 @@ object Main extends JFXApp {
     floorRectangles += rectangle
 
     }
+    for (i <- walls) {
+    val rectangle = new Rectangle {
+    x = i.location._1 * 10
+    y = i.location._2 * 10
+    width = 10
+    height = 10
+    fill = Black //scalafx.scene.paint.Color
+}
+    wallRectangles += rectangle
+
+    }
     floorRectangles.foreach(n => root.children += n)
+    wallRectangles.foreach(n => root.children += n)
+
 
 }
 
