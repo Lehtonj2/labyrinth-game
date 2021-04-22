@@ -15,8 +15,8 @@ object Main extends JFXApp {
 
     stage = new JFXApp.PrimaryStage {
         title.value = "Labyrinth-game"
-        height = 400
-        width = 400
+        height = 350
+        width = 350
     }
 
     val root = new Pane //Simple pane component
@@ -27,7 +27,7 @@ object Main extends JFXApp {
     val gridLocations = grid.locations
     val labyrinth = new Labyrinth
     val floors = labyrinth.createLabyrinth(grid)
-    val walls = new Grid((grid.width * 3) - 1, (grid.height * 3) - 1).locations.filter(n => !floors.map(_.location).contains(n)).map(n => new Wall(n._1, n._2, false))
+    val walls = new Grid((grid.width * 3 - 1), (grid.height * 3 - 1)).locations.filter(n => !floors.map(_.location).contains(n)).map(n => new Wall(n._1, n._2, false))
     val floorRectangles = Buffer[Rectangle]()
     val wallRectangles = Buffer[Rectangle]()
     for (i <- floors) {
@@ -37,6 +37,7 @@ object Main extends JFXApp {
     width = 10
     height = 10
     fill = Blue //scalafx.scene.paint.Color
+    if (i.underLap) fill = Gray
 }
     floorRectangles += rectangle
 

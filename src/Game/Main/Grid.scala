@@ -20,5 +20,32 @@ class Grid(val width: Int, val height: Int) {
     if (contains(x + 1, y)) neighbourLocations.+=:((x + 1, y), "E")
     neighbourLocations
   }
+  def weavableNeighbours(x: Int, y: Int) = {
+    val neighbourLocations = Buffer[((Int, Int),(String))]()
+    if (contains(x, y - 2)) neighbourLocations.+=:((x, y - 2), "N")
+    if (contains(x, y + 2)) neighbourLocations.+=:((x, y + 2), "S")
+    if (contains(x - 2, y)) neighbourLocations.+=:((x - 2, y), "W")
+    if (contains(x + 2, y)) neighbourLocations.+=:((x + 2, y), "E")
+    neighbourLocations
+  }
+  def beforeWeave(x: Int, y: Int, dir: String) = {
+    dir match {
+      case "N" => {
+        (x, y + 1)
+      }
+      case "S" => {
+        (x, y - 1)
+      }
+      case "W" => {
+        (x + 1, y)
+      }
+      case "E" => {
+        (x - 1, y)
+      }
+    }
+    }
+
 
 }
+
+

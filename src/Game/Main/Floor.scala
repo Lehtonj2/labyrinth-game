@@ -1,6 +1,6 @@
 package Game.Main
 
-class Floor(x: Int, y: Int, overlapping: Boolean) extends Object {
+class Floor(x: Int, y: Int, underlapping: Boolean) extends Object {
   def location = (x, y)
-  def overLap = overlapping
+  def underLap = underlapping
 }
