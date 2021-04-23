@@ -62,14 +62,29 @@ object Main extends JFXApp {
     content = floorRectangles.toList ++ wallRectangles.toList ++ List(playerRectangle)
     onKeyPressed = (ke: KeyEvent) => {
         ke.code match {
-            case KeyCode.Up => game.player.y -= 1
+            case KeyCode.Up => {
+                if (!game.walls.map(n => n.location).contains((game.player.x, game.player.y - 1))) {
+                game.player.y -= 1
                 playerRectangle.y = playerRectangle.y() - 10
-            case KeyCode.Down => game.player.y += 1
+                }
+            }
+            case KeyCode.Down => {
+                if (!game.walls.map(n => n.location).contains((game.player.x, game.player.y + 1))) {
+                game.player.y += 1
                 playerRectangle.y = playerRectangle.y() + 10
-            case KeyCode.Left => game.player.x -= 1
+                }
+            }
+            case KeyCode.Left => {
+                if (!game.walls.map(n => n.location).contains((game.player.x - 1, game.player.y))) {
+                game.player.x -= 1
                 playerRectangle.x = playerRectangle.x() - 10
-            case KeyCode.Right => { game.player.x += 1
-            playerRectangle.x = playerRectangle.x() + 10
+                }
+            }
+            case KeyCode.Right => {
+                if (!game.walls.map(n => n.location).contains((game.player.x + 1, game.player.y))) {
+                game.player.x += 1
+                playerRectangle.x = playerRectangle.x() + 10
+                }
             }
             case _ =>
         }
