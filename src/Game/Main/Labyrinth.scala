@@ -3,6 +3,7 @@ import scala.collection.mutable.Buffer
 import scala.util.Random
 
 class Labyrinth {
+  val bridgeLocations = Buffer[(Int, Int, String)]()
   def closeWalls(x: Int, y: Int, dir: String) = {
     val walls = Buffer[(Int, Int)]()
     dir match {
@@ -88,6 +89,17 @@ class Labyrinth {
               drawFloors += new Floor(neighbour._1._1 * 3 + 1, neighbour._1._2 * 3 + 4, true)
               drawFloors += new Floor(neighbour._1._1 * 3, neighbour._1._2 * 3 + 5, true)
               drawFloors += new Floor(neighbour._1._1 * 3 + 1, neighbour._1._2 * 3 + 5, true)
+              this.bridgeLocations += ((neighbour._1._1 * 3, neighbour._1._2 * 3 + 2, "N"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 + 1, neighbour._1._2 * 3 + 2, "N"))
+              this.bridgeLocations += ((neighbour._1._1 * 3, neighbour._1._2 * 3 + 3, "N"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 + 1, neighbour._1._2 * 3 + 3, "N"))
+              this.bridgeLocations += ((neighbour._1._1 * 3, neighbour._1._2 * 3 + 4, "N"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 + 1, neighbour._1._2 * 3 + 4, "N"))
+              this.bridgeLocations += ((neighbour._1._1 * 3, neighbour._1._2 * 3 + 5, "N"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 + 1, neighbour._1._2 * 3 + 5, "N"))
+
+
+
             }
             case "S" => {
               drawFloors += new Floor(neighbour._1._1 * 3, neighbour._1._2 * 3 - 1, true)
@@ -98,6 +110,14 @@ class Labyrinth {
               drawFloors += new Floor(neighbour._1._1 * 3 + 1, neighbour._1._2 * 3 - 3, true)
               drawFloors += new Floor(neighbour._1._1 * 3, neighbour._1._2 * 3 - 4, true)
               drawFloors += new Floor(neighbour._1._1 * 3 + 1, neighbour._1._2 * 3 - 4, true)
+              this.bridgeLocations += ((neighbour._1._1 * 3, neighbour._1._2 * 3 - 1, "S"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 + 1, neighbour._1._2 * 3 - 1, "S"))
+              this.bridgeLocations += ((neighbour._1._1 * 3, neighbour._1._2 * 3 - 2, "S"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 + 1, neighbour._1._2 * 3 - 2, "S"))
+              this.bridgeLocations += ((neighbour._1._1 * 3, neighbour._1._2 * 3 - 3, "S"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 + 1, neighbour._1._2 * 3 - 3, "S"))
+              this.bridgeLocations += ((neighbour._1._1 * 3, neighbour._1._2 * 3 - 4, "S"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 + 1, neighbour._1._2 * 3 - 4, "S"))
             }
             case "W" => {
               drawFloors += new Floor(neighbour._1._1 * 3 + 2, neighbour._1._2 * 3, true)
@@ -108,6 +128,14 @@ class Labyrinth {
               drawFloors += new Floor(neighbour._1._1 * 3 + 4, neighbour._1._2 * 3 + 1, true)
               drawFloors += new Floor(neighbour._1._1 * 3 + 5, neighbour._1._2 * 3, true)
               drawFloors += new Floor(neighbour._1._1 * 3 + 5, neighbour._1._2 * 3 + 1, true)
+              this.bridgeLocations += ((neighbour._1._1 * 3 + 2, neighbour._1._2 * 3, "W"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 + 2, neighbour._1._2 * 3 + 1, "W"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 + 3, neighbour._1._2 * 3, "W"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 + 3, neighbour._1._2 * 3 + 1, "W"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 + 4, neighbour._1._2 * 3, "W"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 + 4, neighbour._1._2 * 3 + 1, "W"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 + 5, neighbour._1._2 * 3, "W"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 + 5, neighbour._1._2 * 3 + 1, "W"))
             }
             case "E" => {
               drawFloors += new Floor(neighbour._1._1 * 3 - 1, neighbour._1._2 * 3, true)
@@ -118,6 +146,14 @@ class Labyrinth {
               drawFloors += new Floor(neighbour._1._1 * 3 - 3, neighbour._1._2 * 3 + 1, true)
               drawFloors += new Floor(neighbour._1._1 * 3 - 4, neighbour._1._2 * 3, true)
               drawFloors += new Floor(neighbour._1._1 * 3 - 4, neighbour._1._2 * 3 + 1, true)
+              this.bridgeLocations += ((neighbour._1._1 * 3 - 1, neighbour._1._2 * 3, "E"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 - 1, neighbour._1._2 * 3 + 1, "E"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 - 2, neighbour._1._2 * 3, "E"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 - 2, neighbour._1._2 * 3 + 1, "E"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 - 3, neighbour._1._2 * 3, "E"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 - 3, neighbour._1._2 * 3 + 1, "E"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 - 4, neighbour._1._2 * 3, "E"))
+              this.bridgeLocations += ((neighbour._1._1 * 3 - 4, neighbour._1._2 * 3 + 1, "E"))
             }
           }
         }else{

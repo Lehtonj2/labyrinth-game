@@ -59,31 +59,134 @@ object Main extends JFXApp {
     //floorRectangles.foreach(n => root.children += n)
     //wallRectangles.foreach(n => root.children += n)
     //root.children += playerRectangle
-    content = floorRectangles.toList ++ wallRectangles.toList ++ List(playerRectangle)
+    def hidePlayer(hide: Boolean) {
+        if (hide) content = floorRectangles ++ wallRectangles else content = floorRectangles ++ wallRectangles ++ Buffer(playerRectangle)
+    }
+    hidePlayer(false)
+
+    var fromDirection = ""
+    var onBridge = false
     onKeyPressed = (ke: KeyEvent) => {
         ke.code match {
             case KeyCode.Up => {
-                if (!game.walls.map(n => n.location).contains((game.player.x, game.player.y - 1))) {
-                game.player.y -= 1
-                playerRectangle.y = playerRectangle.y() - 10
-                }
+                if (!game.walls.map(n => n.location).contains((game.player.x, game.player.y - 1)) & game.labyrinthLocations.locations.map(n => (n._1, n._2)).contains((game.player.x, game.player.y - 1))) {
+                    if (!game.bridges.map(n => (n._1, n._2)).contains((game.player.x, game.player.y - 1)) & !onBridge) {
+                        game.player.y -= 1
+                        playerRectangle.y = playerRectangle.y() - 10
+                    } else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y - 1, "N")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y - 1, "S"))) & !onBridge) {
+                        game.player.y -= 1
+                        playerRectangle.y = playerRectangle.y() - 10
+                        fromDirection = "v"
+                        onBridge = true
+                    }else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y - 1, "W")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y - 1, "E"))) & !onBridge) {
+                        game.player.y -= 1
+                        playerRectangle.y = playerRectangle.y() - 10
+                        fromDirection = "v"
+                        onBridge = true
+                        hidePlayer(true)
+                    } else if (game.bridges.map(n => (n._1, n._2)).contains((game.player.x, game.player.y - 1))) {
+                        game.player.y -= 1
+                        playerRectangle.y = playerRectangle.y() - 10
+                        onBridge = true
+                    }else if ((fromDirection == "v")) {
+                        game.player.y -= 1
+                        playerRectangle.y = playerRectangle.y() - 10
+                        onBridge = false
+                        hidePlayer(false)
+                    }
+
+
             }
+            }
+
+
             case KeyCode.Down => {
-                if (!game.walls.map(n => n.location).contains((game.player.x, game.player.y + 1))) {
-                game.player.y += 1
-                playerRectangle.y = playerRectangle.y() + 10
-                }
+                if (!game.walls.map(n => n.location).contains((game.player.x, game.player.y + 1)) & game.labyrinthLocations.locations.map(n => (n._1, n._2)).contains((game.player.x, game.player.y + 1))) {
+                    if (!game.bridges.map(n => (n._1, n._2)).contains((game.player.x, game.player.y + 1)) & !onBridge) {
+                        game.player.y += 1
+                        playerRectangle.y = playerRectangle.y() + 10
+                    } else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y + 1, "N")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y + 1, "S"))) & !onBridge) {
+                        game.player.y += 1
+                        playerRectangle.y = playerRectangle.y() + 10
+                        fromDirection = "v"
+                        onBridge = true
+                    }else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y + 1, "W")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y + 1, "E"))) & !onBridge) {
+                        game.player.y += 1
+                        playerRectangle.y = playerRectangle.y() + 10
+                        fromDirection = "v"
+                        onBridge = true
+                        hidePlayer(true)
+                    } else if (game.bridges.map(n => (n._1, n._2)).contains((game.player.x, game.player.y + 1))) {
+                        game.player.y += 1
+                        playerRectangle.y = playerRectangle.y() + 10
+                        onBridge = true
+                    }else if ((fromDirection == "v")) {
+                        game.player.y += 1
+                        playerRectangle.y = playerRectangle.y() + 10
+                        onBridge = false
+                        hidePlayer(false)
+                    }
+
+
+            }
+
             }
             case KeyCode.Left => {
-                if (!game.walls.map(n => n.location).contains((game.player.x - 1, game.player.y))) {
-                game.player.x -= 1
-                playerRectangle.x = playerRectangle.x() - 10
+                if (!game.walls.map(n => n.location).contains((game.player.x - 1, game.player.y)) & game.labyrinthLocations.locations.map(n => (n._1, n._2)).contains((game.player.x - 1, game.player.y))) {
+                    if (!game.bridges.map(n => (n._1, n._2)).contains((game.player.x - 1, game.player.y)) & !onBridge) {
+                        game.player.x -= 1
+                        playerRectangle.x = playerRectangle.x() - 10
+                    } else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x - 1, game.player.y, "N")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x - 1, game.player.y, "S"))) & !onBridge) {
+                        game.player.x -= 1
+                        playerRectangle.x = playerRectangle.x() - 10
+                        fromDirection = "h"
+                        onBridge = true
+                        hidePlayer(true)
+                    }else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x - 1, game.player.y, "W")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x - 1, game.player.y, "E"))) & !onBridge) {
+                        game.player.x -= 1
+                        playerRectangle.x = playerRectangle.x() - 10
+                        fromDirection = "h"
+                        onBridge = true
+                    }else if (game.bridges.map(n => (n._1, n._2)).contains((game.player.x - 1, game.player.y))) {
+                        game.player.x -= 1
+                        playerRectangle.x = playerRectangle.x() - 10
+                        onBridge = true
+
+                    }else if (fromDirection == "h") {
+                        game.player.x -= 1
+                        playerRectangle.x = playerRectangle.x() - 10
+                        onBridge = false
+                        hidePlayer(false)
+                    }
                 }
             }
             case KeyCode.Right => {
-                if (!game.walls.map(n => n.location).contains((game.player.x + 1, game.player.y))) {
-                game.player.x += 1
-                playerRectangle.x = playerRectangle.x() + 10
+                if (!game.walls.map(n => n.location).contains((game.player.x + 1, game.player.y)) & game.labyrinthLocations.locations.map(n => (n._1, n._2)).contains((game.player.x + 1, game.player.y))) {
+                    if (!game.bridges.map(n => (n._1, n._2)).contains((game.player.x + 1, game.player.y)) & !onBridge) {
+                        game.player.x += 1
+                        playerRectangle.x = playerRectangle.x() + 10
+                    } else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x + 1, game.player.y, "N")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x + 1, game.player.y, "S"))) & !onBridge) {
+                        game.player.x += 1
+                        playerRectangle.x = playerRectangle.x() + 10
+                        fromDirection = "h"
+                        onBridge = true
+                        hidePlayer(true)
+                    }else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x + 1, game.player.y, "W")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x + 1, game.player.y, "E"))) & !onBridge) {
+                        game.player.x += 1
+                        playerRectangle.x = playerRectangle.x() + 10
+                        fromDirection = "h"
+                        onBridge = true
+                    }else if (game.bridges.map(n => (n._1, n._2)).contains((game.player.x + 1, game.player.y))) {
+                        game.player.x += 1
+                        playerRectangle.x = playerRectangle.x() + 10
+                        onBridge = true
+
+                    }else if (fromDirection == "h") {
+                        game.player.x += 1
+                        playerRectangle.x = playerRectangle.x() + 10
+                        onBridge = false
+                        hidePlayer(false)
+                    }
                 }
             }
             case _ =>
@@ -91,13 +194,8 @@ object Main extends JFXApp {
         }
         //root.children += playerRectangle
 
-
     }
 
-
-
 }
-
-
 
 
