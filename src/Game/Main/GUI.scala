@@ -18,8 +18,8 @@ object Main extends JFXApp {
 
     stage = new JFXApp.PrimaryStage {
         title.value = "Labyrinth-game"
-        height = 350
-        width = 350
+        height = 400
+        width = 400
     }
     stage.scene = new Scene(350, 350) {
 
@@ -60,9 +60,16 @@ object Main extends JFXApp {
     //wallRectangles.foreach(n => root.children += n)
     //root.children += playerRectangle
     def hidePlayer(hide: Boolean) {
-        if (hide) content = floorRectangles ++ wallRectangles else content = floorRectangles ++ wallRectangles ++ Buffer(playerRectangle)
+        if (hide) {
+            playerHidden = true
+            content = floorRectangles ++ wallRectangles
+        } else {
+            content = floorRectangles ++ wallRectangles ++ Buffer(playerRectangle)
+            playerHidden = false
+        }
     }
     hidePlayer(false)
+    var playerHidden = false
 
     var fromDirection = ""
     var onBridge = false
@@ -85,9 +92,17 @@ object Main extends JFXApp {
                         onBridge = true
                         hidePlayer(true)
                     } else if (game.bridges.map(n => (n._1, n._2)).contains((game.player.x, game.player.y - 1))) {
-                        game.player.y -= 1
-                        playerRectangle.y = playerRectangle.y() - 10
-                        onBridge = true
+                        if (game.bridges.filter(n => (n._1 == game.player.x) & n._2 == game.player.y).map(n => n._3) == game.bridges.filter(n => (n._1 == game.player.x) & n._2 == game.player.y - 1).map(n => n._3)) {
+                            game.player.y -= 1
+                            playerRectangle.y = playerRectangle.y() - 10
+                            onBridge = true
+                        }  else if ((fromDirection == "v")) {
+                            game.player.y -= 1
+                            playerRectangle.y = playerRectangle.y() - 10
+                            fromDirection = "v"
+                            onBridge = true
+                            hidePlayer(!playerHidden)
+                        }
                     }else if ((fromDirection == "v")) {
                         game.player.y -= 1
                         playerRectangle.y = playerRectangle.y() - 10
@@ -117,9 +132,17 @@ object Main extends JFXApp {
                         onBridge = true
                         hidePlayer(true)
                     } else if (game.bridges.map(n => (n._1, n._2)).contains((game.player.x, game.player.y + 1))) {
-                        game.player.y += 1
-                        playerRectangle.y = playerRectangle.y() + 10
-                        onBridge = true
+                        if (game.bridges.filter(n => (n._1 == game.player.x) & n._2 == game.player.y).map(n => n._3) == game.bridges.filter(n => (n._1 == game.player.x) & n._2 == game.player.y + 1).map(n => n._3)) {
+                            game.player.y += 1
+                            playerRectangle.y = playerRectangle.y() + 10
+                            onBridge = true
+                        } else if ((fromDirection == "v")) {
+                            game.player.y += 1
+                            playerRectangle.y = playerRectangle.y() + 10
+                            fromDirection = "v"
+                            onBridge = true
+                            hidePlayer(!playerHidden)
+                        }
                     }else if ((fromDirection == "v")) {
                         game.player.y += 1
                         playerRectangle.y = playerRectangle.y() + 10
@@ -148,9 +171,17 @@ object Main extends JFXApp {
                         fromDirection = "h"
                         onBridge = true
                     }else if (game.bridges.map(n => (n._1, n._2)).contains((game.player.x - 1, game.player.y))) {
-                        game.player.x -= 1
-                        playerRectangle.x = playerRectangle.x() - 10
-                        onBridge = true
+                        if (game.bridges.filter(n => (n._1 == game.player.x) & n._2 == game.player.y).map(n => n._3) == game.bridges.filter(n => (n._1 == game.player.x - 1) & n._2 == game.player.y).map(n => n._3)) {
+                            game.player.x -= 1
+                            playerRectangle.x = playerRectangle.x() - 10
+                            onBridge = true
+                        }  else if ((fromDirection == "h")) {
+                            game.player.x -= 1
+                            playerRectangle.x = playerRectangle.x() - 10
+                            fromDirection = "h"
+                            onBridge = true
+                            hidePlayer(!playerHidden)
+                        }
 
                     }else if (fromDirection == "h") {
                         game.player.x -= 1
@@ -177,9 +208,17 @@ object Main extends JFXApp {
                         fromDirection = "h"
                         onBridge = true
                     }else if (game.bridges.map(n => (n._1, n._2)).contains((game.player.x + 1, game.player.y))) {
-                        game.player.x += 1
-                        playerRectangle.x = playerRectangle.x() + 10
-                        onBridge = true
+                        if (game.bridges.filter(n => (n._1 == game.player.x) & n._2 == game.player.y).map(n => n._3) == game.bridges.filter(n => (n._1 == game.player.x + 1) & n._2 == game.player.y).map(n => n._3)) {
+                            game.player.x += 1
+                            playerRectangle.x = playerRectangle.x() + 10
+                            onBridge = true
+                        }  else if ((fromDirection == "h")) {
+                            game.player.x += 1
+                            playerRectangle.x = playerRectangle.x() + 10
+                            fromDirection = "h"
+                            onBridge = true
+                            hidePlayer(!playerHidden)
+                        }
 
                     }else if (fromDirection == "h") {
                         game.player.x += 1

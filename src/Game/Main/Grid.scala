@@ -8,7 +8,6 @@ class Grid(val width: Int, val height: Int) {
   private val x = (0 until width).toArray
 
   val locations = x.flatMap(n => y.map(m => (n, m))).toBuffer
-  println(locations)
 
   def contains(x:Int, y: Int) = x >= 0 && x < this.width && y >= 0 && y < this.height
 
@@ -44,6 +43,7 @@ class Grid(val width: Int, val height: Int) {
       }
     }
     }
+
 
 
 }

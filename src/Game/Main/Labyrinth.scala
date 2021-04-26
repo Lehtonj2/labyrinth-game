@@ -160,8 +160,6 @@ class Labyrinth {
           floorCells -= next
         }
     }
-      println(visitedCells)
-      println(drawFloors.map(_.location))
       drawFloors
   }
 
