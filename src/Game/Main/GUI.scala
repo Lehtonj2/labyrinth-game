@@ -291,9 +291,8 @@ object Main extends JFXApp {
     root.add(rootPane, 0, 0)
     var newSize = 10
     def updateNewSize(number: StringProperty) {
-      if (textInput.text.isNotEqualTo("").get() & textInput.text.toString().forall(n => Buffer[Char](0, 1, 2, 3, 4, 5, 6, 7, 8, 9).contains(n))) {
-        var text = number
-        this.newSize = text.value.toInt
+      if (number.value.nonEmpty & number.value.forall(n => n.isDigit)) {
+        this.newSize = number.value.toInt
       } else this.newSize = 10
     }
     startGame.onAction = (ae: ActionEvent) => {
