@@ -2,13 +2,16 @@ package Game.Main
 
 
 import scalafx.Includes._
-import scalafx.application.JFXApp
-import scalafx.scene.Scene
-import scalafx.scene.input.KeyEvent
+import scalafx.scene.control.{Label, Menu, MenuBar, MenuItem, TextField}
 import scalafx.scene.input.KeyCode
+import scalafx.scene.input.KeyEvent
 import scalafx.scene.paint.Color._
 import scalafx.scene.shape.Rectangle
-import scalafx.scene.layout.Pane
+import scalafx.application.JFXApp
+import scalafx.beans.property.StringProperty
+import scalafx.scene.Scene
+import scalafx.scene.layout.{BorderPane, GridPane, VBox}
+import scalafx.event.ActionEvent
 
 import scala.collection.mutable.Buffer
 
@@ -16,63 +19,102 @@ import scala.collection.mutable.Buffer
 
 object Main extends JFXApp {
 
+
     stage = new JFXApp.PrimaryStage {
         title.value = "Labyrinth-game"
-        height = 400
-        width = 400
+        height = 500
+        width = 500
+
     }
-    stage.scene = new Scene(350, 350) {
+    val bottomBox = new VBox //VBox lays out children next to each other vertically.
+    val label = new Label("Enter next labyrinth-size (Default = 10)")
+    val textInput = new TextField
+    bottomBox.children += label
+    bottomBox.children += textInput
+
+    //Accessing textinput text.
+    val root = new GridPane
+
+    root.add(bottomBox, 1, 1)
+    val menuScene = new Scene(root)
 
     val game = new Game
-    val floorRectangles = Buffer[Rectangle]()
-    val wallRectangles = Buffer[Rectangle]()
+    var floorRectangles = Buffer[Rectangle]()
+    var wallRectangles = Buffer[Rectangle]()
+    def makeFloorRectangles() {
     for (i <- game.floors) {
     val rectangle = new Rectangle {
     x = i.location._1 * 10
     y = i.location._2 * 10
     width = 10
     height = 10
-    fill = Blue //scalafx.scene.paint.Color
+    fill = Blue
     if (i.underLap) fill = Gray
 }
     floorRectangles += rectangle
 
     }
+    }
+    def makeWallRectangles() {
     for (i <- game.walls) {
     val rectangle = new Rectangle {
     x = i.location._1 * 10
     y = i.location._2 * 10
     width = 10
     height = 10
-    fill = Black //scalafx.scene.paint.Color
+    fill = Black
 }
     wallRectangles += rectangle
 
     }
-    var playerRectangle = new Rectangle {
-    x = game.player.x
-    y = game.player.y
+    }
+    def makePlayerRectangle = {
+      var playerRectangle = new Rectangle {
+      x = game.player.x * 10
+      y = game.player.y * 10
+      width = 10
+      height = 10
+      fill = Red
+      }
+        playerRectangle
+      }
+    var playerRectangle = makePlayerRectangle
+    val exitRectangle = new Rectangle {
+    x = 0
+    y = 0
     width = 10
     height = 10
-    fill = Red
-    }//scalafx.scene.paint.Color
-    //floorRectangles.foreach(n => root.children += n)
-    //wallRectangles.foreach(n => root.children += n)
-    //root.children += playerRectangle
+    fill = Yellow
+    }
+
+
+    def newGameScene = {
+    var gameScene = new Scene {
+
     def hidePlayer(hide: Boolean) {
         if (hide) {
             playerHidden = true
-            content = floorRectangles ++ wallRectangles
+            content = floorRectangles ++ wallRectangles ++ Buffer(exitRectangle)
         } else {
-            content = floorRectangles ++ wallRectangles ++ Buffer(playerRectangle)
-            playerHidden = false
+            content = floorRectangles ++ wallRectangles ++ Buffer(exitRectangle) ++ Buffer(playerRectangle)
+          playerHidden = false
         }
     }
+
     hidePlayer(false)
     var playerHidden = false
 
     var fromDirection = ""
     var onBridge = false
+    def done() {
+        if (game.player.x == 0 & game.player.y == 0) {
+          stage.scene = menuScene
+        }
+    }
+
+
+
+
     onKeyPressed = (ke: KeyEvent) => {
         ke.code match {
             case KeyCode.Up => {
@@ -112,6 +154,7 @@ object Main extends JFXApp {
 
 
             }
+              done()
             }
 
 
@@ -152,7 +195,7 @@ object Main extends JFXApp {
 
 
             }
-
+              done()
             }
             case KeyCode.Left => {
                 if (!game.walls.map(n => n.location).contains((game.player.x - 1, game.player.y)) & game.labyrinthLocations.locations.map(n => (n._1, n._2)).contains((game.player.x - 1, game.player.y))) {
@@ -190,6 +233,7 @@ object Main extends JFXApp {
                         hidePlayer(false)
                     }
                 }
+              done()
             }
             case KeyCode.Right => {
                 if (!game.walls.map(n => n.location).contains((game.player.x + 1, game.player.y)) & game.labyrinthLocations.locations.map(n => (n._1, n._2)).contains((game.player.x + 1, game.player.y))) {
@@ -227,14 +271,47 @@ object Main extends JFXApp {
                         hidePlayer(false)
                     }
                 }
+              done()
             }
             case _ =>
         }
         }
-        //root.children += playerRectangle
+    }
+      gameScene
+    }
+
+    val menuBar = new MenuBar
+    val menu = new Menu("Menu")
+    val startGame = new MenuItem("Start game")
+    menu.items = List(startGame)
+    menuBar.menus = List(menu)
+    val rootPane = new BorderPane
+    rootPane.top = menuBar
+    //this.menuScene.root = rootPane
+    root.add(rootPane, 0, 0)
+    var newSize = 10
+    def updateNewSize(number: StringProperty) {
+      if (textInput.text.isNotEqualTo("").get() & textInput.text.toString().forall(n => Buffer[Char](0, 1, 2, 3, 4, 5, 6, 7, 8, 9).contains(n))) {
+        var text = number
+        this.newSize = text.value.toInt
+      } else this.newSize = 10
+    }
+    startGame.onAction = (ae: ActionEvent) => {
+
+      updateNewSize(textInput.text)
+      this.game.newGrid(newSize, newSize)
+      this.game.newLabyrinth()
+      this.playerRectangle = this.makePlayerRectangle
+      this.floorRectangles.clear()
+      this.wallRectangles.clear()
+      this.makeFloorRectangles()
+      this.makeWallRectangles()
+      stage.scene = newGameScene
+    }
+  stage.scene = menuScene
 
     }
 
-}
+
 
 
