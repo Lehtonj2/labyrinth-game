@@ -12,6 +12,7 @@ import scalafx.beans.property.StringProperty
 import scalafx.scene.Scene
 import scalafx.scene.layout.{BorderPane, GridPane, VBox}
 import scalafx.event.ActionEvent
+import scalafx.scene.text.FontWeight
 
 import scala.collection.mutable.Buffer
 
@@ -26,13 +27,13 @@ object Main extends JFXApp {
         width = 500
 
     }
-    val bottomBox = new VBox //VBox lays out children next to each other vertically.
+    val bottomBox = new VBox
     val label = new Label("Enter next labyrinth-size (Default = 10, Max = 50)")
     val textInput = new TextField
     bottomBox.children += label
     bottomBox.children += textInput
 
-    //Accessing textinput text.
+
     val root = new GridPane
 
     root.add(bottomBox, 1, 1)
@@ -40,21 +41,22 @@ object Main extends JFXApp {
 
     var newSize = 15
     def scale(size: Int):Double = {
-      if (size <= 20) 1.0 else 0.5
+      if (size <= 20) 10 else 4
     }
     val game = new Game
     var floorRectangles = Buffer[Rectangle]()
     var wallRectangles = Buffer[Rectangle]()
+    var solveRectangles = Buffer[Rectangle]()
     def makeFloorRectangles() {
     for (i <- game.floors) {
     val rectangle = new Rectangle {
-    x = i.location._1 * 10 * scale(newSize)
-    y = i.location._2 * 10 * scale(newSize)
-    width = 10 * scale(newSize)
-    height = 10 * scale(newSize)
+    x = i.location._1 * scale(newSize)
+    y = i.location._2 * scale(newSize)
+    width = scale(newSize)
+    height = scale(newSize)
     fill = Blue
     if (i.underLap) fill = Gray
-}
+    }
     floorRectangles += rectangle
 
     }
@@ -62,10 +64,10 @@ object Main extends JFXApp {
     def makeWallRectangles() {
     for (i <- game.walls) {
     val rectangle = new Rectangle {
-    x = i.location._1 * 10 * scale(newSize)
-    y = i.location._2 * 10 * scale(newSize)
-    width = 10 * scale(newSize)
-    height = 10 * scale(newSize)
+    x = i.location._1 * scale(newSize)
+    y = i.location._2 * scale(newSize)
+    width = scale(newSize)
+    height = scale(newSize)
     fill = Black
 }
     wallRectangles += rectangle
@@ -74,10 +76,10 @@ object Main extends JFXApp {
     }
     def makePlayerRectangle = {
       var playerRectangle = new Rectangle {
-      x = game.player.x * 10 * scale(newSize)
-      y = game.player.y * 10 * scale(newSize)
-      width = 10 * scale(newSize)
-      height = 10 * scale(newSize)
+      x = game.player.x * scale(newSize)
+      y = game.player.y * scale(newSize)
+      width = scale(newSize)
+      height = scale(newSize)
       fill = Red
       }
         playerRectangle
@@ -87,17 +89,42 @@ object Main extends JFXApp {
     var exitRectangle = new Rectangle {
     x = 0
     y = 0
-    width = 10 * scale(newSize)
-    height = 10 * scale(newSize)
+    width = scale(newSize)
+    height = scale(newSize)
     fill = Yellow
     }
       exitRectangle
     }
     var exitRectangle = makeExitRectangle
+
+    def makeSolveRectangles() = {
+    val solveFloors = game.solveLabyrinth(game.player.x, game.player.y)
+    for (i <- solveFloors) {
+    var solveRectangle = new Rectangle {
+    x = i.location._1 * scale(newSize)
+    y = i.location._2 * scale(newSize)
+    width = scale(newSize)
+    height = scale(newSize)
+    fill = Yellow
+    }
+      solveRectangles += solveRectangle
+    }
+    }
+
     def newGameScene = {
     var gameScene = new Scene {
-
+    var drawSolver = false
     def hidePlayer(hide: Boolean) {
+        if (drawSolver) {
+          if (hide) {
+            playerHidden = true
+            content = floorRectangles ++ wallRectangles ++ Buffer(exitRectangle) ++ solveRectangles
+        } else {
+            content = floorRectangles ++ wallRectangles ++ Buffer(exitRectangle) ++ solveRectangles ++ Buffer(playerRectangle)
+          playerHidden = false
+        }
+
+        }else{
         if (hide) {
             playerHidden = true
             content = floorRectangles ++ wallRectangles ++ Buffer(exitRectangle)
@@ -105,6 +132,7 @@ object Main extends JFXApp {
             content = floorRectangles ++ wallRectangles ++ Buffer(exitRectangle) ++ Buffer(playerRectangle)
           playerHidden = false
         }
+    }
     }
 
     hidePlayer(false)
@@ -127,33 +155,33 @@ object Main extends JFXApp {
                 if (!game.walls.map(n => n.location).contains((game.player.x, game.player.y - 1)) & game.labyrinthLocations.locations.map(n => (n._1, n._2)).contains((game.player.x, game.player.y - 1))) {
                     if (!game.bridges.map(n => (n._1, n._2)).contains((game.player.x, game.player.y - 1)) & !onBridge) {
                         game.player.y -= 1
-                        playerRectangle.y = playerRectangle.y() - 10 * scale(newSize)
+                        playerRectangle.y = playerRectangle.y() - scale(newSize)
                     } else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y - 1, "N")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y - 1, "S"))) & !onBridge) {
                         game.player.y -= 1
-                        playerRectangle.y = playerRectangle.y() - 10 * scale(newSize)
+                        playerRectangle.y = playerRectangle.y() - scale(newSize)
                         fromDirection = "v"
                         onBridge = true
                     }else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y - 1, "W")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y - 1, "E"))) & !onBridge) {
                         game.player.y -= 1
-                        playerRectangle.y = playerRectangle.y() - 10 * scale(newSize)
+                        playerRectangle.y = playerRectangle.y() - scale(newSize)
                         fromDirection = "v"
                         onBridge = true
                         hidePlayer(true)
                     } else if (game.bridges.map(n => (n._1, n._2)).contains((game.player.x, game.player.y - 1))) {
                         if (game.bridges.filter(n => (n._1 == game.player.x) & n._2 == game.player.y).map(n => n._3) == game.bridges.filter(n => (n._1 == game.player.x) & n._2 == game.player.y - 1).map(n => n._3)) {
                             game.player.y -= 1
-                            playerRectangle.y = playerRectangle.y() - 10 * scale(newSize)
+                            playerRectangle.y = playerRectangle.y() - scale(newSize)
                             onBridge = true
                         }  else if ((fromDirection == "v")) {
                             game.player.y -= 1
-                            playerRectangle.y = playerRectangle.y() - 10 * scale(newSize)
+                            playerRectangle.y = playerRectangle.y() - scale(newSize)
                             fromDirection = "v"
                             onBridge = true
                             hidePlayer(!playerHidden)
                         }
                     }else if ((fromDirection == "v")) {
                         game.player.y -= 1
-                        playerRectangle.y = playerRectangle.y() - 10 * scale(newSize)
+                        playerRectangle.y = playerRectangle.y() - scale(newSize)
                         onBridge = false
                         hidePlayer(false)
                     }
@@ -168,33 +196,33 @@ object Main extends JFXApp {
                 if (!game.walls.map(n => n.location).contains((game.player.x, game.player.y + 1)) & game.labyrinthLocations.locations.map(n => (n._1, n._2)).contains((game.player.x, game.player.y + 1))) {
                     if (!game.bridges.map(n => (n._1, n._2)).contains((game.player.x, game.player.y + 1)) & !onBridge) {
                         game.player.y += 1
-                        playerRectangle.y = playerRectangle.y() + 10 * scale(newSize)
+                        playerRectangle.y = playerRectangle.y() + scale(newSize)
                     } else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y + 1, "N")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y + 1, "S"))) & !onBridge) {
                         game.player.y += 1
-                        playerRectangle.y = playerRectangle.y() + 10 * scale(newSize)
+                        playerRectangle.y = playerRectangle.y() + scale(newSize)
                         fromDirection = "v"
                         onBridge = true
                     }else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y + 1, "W")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y + 1, "E"))) & !onBridge) {
                         game.player.y += 1
-                        playerRectangle.y = playerRectangle.y() + 10 * scale(newSize)
+                        playerRectangle.y = playerRectangle.y() + scale(newSize)
                         fromDirection = "v"
                         onBridge = true
                         hidePlayer(true)
                     } else if (game.bridges.map(n => (n._1, n._2)).contains((game.player.x, game.player.y + 1))) {
                         if (game.bridges.filter(n => (n._1 == game.player.x) & n._2 == game.player.y).map(n => n._3) == game.bridges.filter(n => (n._1 == game.player.x) & n._2 == game.player.y + 1).map(n => n._3)) {
                             game.player.y += 1
-                            playerRectangle.y = playerRectangle.y() + 10 * scale(newSize)
+                            playerRectangle.y = playerRectangle.y() + scale(newSize)
                             onBridge = true
                         } else if ((fromDirection == "v")) {
                             game.player.y += 1
-                            playerRectangle.y = playerRectangle.y() + 10 * scale(newSize)
+                            playerRectangle.y = playerRectangle.y() + scale(newSize)
                             fromDirection = "v"
                             onBridge = true
                             hidePlayer(!playerHidden)
                         }
                     }else if ((fromDirection == "v")) {
                         game.player.y += 1
-                        playerRectangle.y = playerRectangle.y() + 10 * scale(newSize)
+                        playerRectangle.y = playerRectangle.y() + scale(newSize)
                         onBridge = false
                         hidePlayer(false)
                     }
@@ -207,26 +235,26 @@ object Main extends JFXApp {
                 if (!game.walls.map(n => n.location).contains((game.player.x - 1, game.player.y)) & game.labyrinthLocations.locations.map(n => (n._1, n._2)).contains((game.player.x - 1, game.player.y))) {
                     if (!game.bridges.map(n => (n._1, n._2)).contains((game.player.x - 1, game.player.y)) & !onBridge) {
                         game.player.x -= 1
-                        playerRectangle.x = playerRectangle.x() - 10 * scale(newSize)
+                        playerRectangle.x = playerRectangle.x() - scale(newSize)
                     } else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x - 1, game.player.y, "N")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x - 1, game.player.y, "S"))) & !onBridge) {
                         game.player.x -= 1
-                        playerRectangle.x = playerRectangle.x() - 10 * scale(newSize)
+                        playerRectangle.x = playerRectangle.x() - scale(newSize)
                         fromDirection = "h"
                         onBridge = true
                         hidePlayer(true)
                     }else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x - 1, game.player.y, "W")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x - 1, game.player.y, "E"))) & !onBridge) {
                         game.player.x -= 1
-                        playerRectangle.x = playerRectangle.x() - 10 * scale(newSize)
+                        playerRectangle.x = playerRectangle.x() - scale(newSize)
                         fromDirection = "h"
                         onBridge = true
                     }else if (game.bridges.map(n => (n._1, n._2)).contains((game.player.x - 1, game.player.y))) {
                         if (game.bridges.filter(n => (n._1 == game.player.x) & n._2 == game.player.y).map(n => n._3) == game.bridges.filter(n => (n._1 == game.player.x - 1) & n._2 == game.player.y).map(n => n._3)) {
                             game.player.x -= 1
-                            playerRectangle.x = playerRectangle.x() - 10 * scale(newSize)
+                            playerRectangle.x = playerRectangle.x() - scale(newSize)
                             onBridge = true
                         }  else if ((fromDirection == "h")) {
                             game.player.x -= 1
-                            playerRectangle.x = playerRectangle.x() - 10 * scale(newSize)
+                            playerRectangle.x = playerRectangle.x() - scale(newSize)
                             fromDirection = "h"
                             onBridge = true
                             hidePlayer(!playerHidden)
@@ -234,7 +262,7 @@ object Main extends JFXApp {
 
                     }else if (fromDirection == "h") {
                         game.player.x -= 1
-                        playerRectangle.x = playerRectangle.x() - 10 * scale(newSize)
+                        playerRectangle.x = playerRectangle.x() - scale(newSize)
                         onBridge = false
                         hidePlayer(false)
                     }
@@ -245,26 +273,26 @@ object Main extends JFXApp {
                 if (!game.walls.map(n => n.location).contains((game.player.x + 1, game.player.y)) & game.labyrinthLocations.locations.map(n => (n._1, n._2)).contains((game.player.x + 1, game.player.y))) {
                     if (!game.bridges.map(n => (n._1, n._2)).contains((game.player.x + 1, game.player.y)) & !onBridge) {
                         game.player.x += 1
-                        playerRectangle.x = playerRectangle.x() + 10 * scale(newSize)
+                        playerRectangle.x = playerRectangle.x() + scale(newSize)
                     } else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x + 1, game.player.y, "N")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x + 1, game.player.y, "S"))) & !onBridge) {
                         game.player.x += 1
-                        playerRectangle.x = playerRectangle.x() + 10 * scale(newSize)
+                        playerRectangle.x = playerRectangle.x() + scale(newSize)
                         fromDirection = "h"
                         onBridge = true
                         hidePlayer(true)
                     }else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x + 1, game.player.y, "W")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x + 1, game.player.y, "E"))) & !onBridge) {
                         game.player.x += 1
-                        playerRectangle.x = playerRectangle.x() + 10 * scale(newSize)
+                        playerRectangle.x = playerRectangle.x() + scale(newSize)
                         fromDirection = "h"
                         onBridge = true
                     }else if (game.bridges.map(n => (n._1, n._2)).contains((game.player.x + 1, game.player.y))) {
                         if (game.bridges.filter(n => (n._1 == game.player.x) & n._2 == game.player.y).map(n => n._3) == game.bridges.filter(n => (n._1 == game.player.x + 1) & n._2 == game.player.y).map(n => n._3)) {
                             game.player.x += 1
-                            playerRectangle.x = playerRectangle.x() + 10 * scale(newSize)
+                            playerRectangle.x = playerRectangle.x() + scale(newSize)
                             onBridge = true
                         }  else if ((fromDirection == "h")) {
                             game.player.x += 1
-                            playerRectangle.x = playerRectangle.x() + 10 * scale(newSize)
+                            playerRectangle.x = playerRectangle.x() + scale(newSize)
                             fromDirection = "h"
                             onBridge = true
                             hidePlayer(!playerHidden)
@@ -272,12 +300,23 @@ object Main extends JFXApp {
 
                     }else if (fromDirection == "h") {
                         game.player.x += 1
-                        playerRectangle.x = playerRectangle.x() + 10 * scale(newSize)
+                        playerRectangle.x = playerRectangle.x() + scale(newSize)
                         onBridge = false
                         hidePlayer(false)
                     }
                 }
               done()
+            }
+            case KeyCode.Space => {
+                  makeSolveRectangles()
+                  drawSolver = true
+                  if (playerHidden) {
+            content = floorRectangles ++ wallRectangles ++ Buffer(exitRectangle) ++ solveRectangles
+        } else {
+            content = floorRectangles ++ wallRectangles ++ Buffer(exitRectangle) ++ solveRectangles ++ Buffer(playerRectangle)
+        }
+
+
             }
             case _ =>
         }
@@ -297,7 +336,7 @@ object Main extends JFXApp {
     root.add(rootPane, 0, 0)
     def updateNewSize(number: StringProperty) {
       if (number.value.nonEmpty & number.value.forall(n => n.isDigit)) {
-        if (number.value.toInt <= 50) this.newSize = number.value.toInt else this.newSize = 50
+        if (number.value.toInt <= 50 & number.value.toInt > 0) this.newSize = number.value.toInt else this.newSize = 50
       } else this.newSize = 10
     }
     startGame.onAction = (ae: ActionEvent) => {
@@ -307,6 +346,7 @@ object Main extends JFXApp {
       this.game.newLabyrinth()
       this.playerRectangle = this.makePlayerRectangle
       this.exitRectangle = this.makeExitRectangle
+      this.solveRectangles.clear()
       this.floorRectangles.clear()
       this.wallRectangles.clear()
       this.makeFloorRectangles()
