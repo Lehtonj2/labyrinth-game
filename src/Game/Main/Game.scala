@@ -13,6 +13,8 @@ class Game {
     var labyrinthLocations = new Grid((grid.width * 3 - 1), (grid.height * 3 - 1))
     var walls = new Grid((grid.width * 3 - 1), (grid.height * 3 - 1)).locations.filter(n => !floors.map(_.location).contains(n)).map(n => new Wall(n._1, n._2, false))
     var player = new Character(15, 15)
+    val fileManager = new FileManager
+    fileManager.saveLabyrinth(this)
     def newGrid(width: Int, height: Int) {
         grid = new Grid(width, height)
         gridLocations = grid.locations
@@ -36,8 +38,15 @@ class Game {
         var dir = "N"
         var wallDir = "W"
         var counter = 50
-        while (!(x2 == 0 & y2 == 0) & counter > 0) {
-            dir match {
+        while (!(x2 == 0 & y2 == 0)/* & counter > 0*/) {
+            if (bridges.map(n => (n._1, n._2)).contains((x2, y2))) {
+                dir match {
+                    case "N" => y2 += 1
+                    case "S" => y2 -= 1
+                    case "W" => x2 += 1
+                    case "E" => x2 -= 1
+                }
+            }else dir match {
                 case "N" => {
                     if (!walls.map(n => (n.location._1, n.location._2)).contains((x2 - 1, y2)) & floors.map(n => (n.location._1, n.location._2)).contains((x2 - 1, y2)) & wallDir == "W") {
                         x2 -= 1
@@ -100,10 +109,12 @@ class Game {
 
             //if (!walls.map(n => (n.location._1, n.location._2)).contains((x2, y2 - 1)) & labyrinthLocations.) {
             solveFloors += new Floor(x2, y2, false)
+
             counter -= 1
             println(x2, y2)
         }
-        solveFloors.filter(n => solveFloors.count(_ == n) == 1)
+        solveFloors
+
 
     }
 }

@@ -113,6 +113,7 @@ object Main extends JFXApp {
 
     def newGameScene = {
     var gameScene = new Scene {
+    var notYetSolved = true
     var drawSolver = false
     def hidePlayer(hide: Boolean) {
         if (drawSolver) {
@@ -308,15 +309,16 @@ object Main extends JFXApp {
               done()
             }
             case KeyCode.Space => {
-                  makeSolveRectangles()
+                  if (notYetSolved) { makeSolveRectangles()
                   drawSolver = true
                   if (playerHidden) {
             content = floorRectangles ++ wallRectangles ++ Buffer(exitRectangle) ++ solveRectangles
         } else {
             content = floorRectangles ++ wallRectangles ++ Buffer(exitRectangle) ++ solveRectangles ++ Buffer(playerRectangle)
         }
+                  notYetSolved = false
 
-
+                  }
             }
             case _ =>
         }
