@@ -5,6 +5,7 @@ import scala.collection.mutable.Buffer
 
 
 class Game {
+    var size = 10
     var grid = new Grid(10, 10)
     var gridLocations = grid.locations
     var labyrinth = new Labyrinth
@@ -111,7 +112,6 @@ class Game {
             solveFloors += new Floor(x2, y2, false)
 
             counter -= 1
-            println(x2, y2)
         }
         val solvedBuffer = Buffer[Floor]()
         if (solveFloors.size <= labyrinthLocations.gridSize) {
