@@ -14,7 +14,7 @@ class Game {
     var walls = new Grid((grid.width * 3 - 1), (grid.height * 3 - 1)).locations.filter(n => !floors.map(_.location).contains(n)).map(n => new Wall(n._1, n._2, false))
     var player = new Character(15, 15)
     val fileManager = new FileManager
-    fileManager.saveLabyrinth(this)
+    var labyrinthSolved = false
     def newGrid(width: Int, height: Int) {
         grid = new Grid(width, height)
         gridLocations = grid.locations
@@ -38,7 +38,7 @@ class Game {
         var dir = "N"
         var wallDir = "W"
         var counter = 50
-        while (!(x2 == 0 & y2 == 0)/* & counter > 0*/) {
+        while ((!(x2 == 0 & y2 == 0) & solveFloors.size <= labyrinthLocations.gridSize)) {
             if (bridges.map(n => (n._1, n._2)).contains((x2, y2))) {
                 dir match {
                     case "N" => y2 += 1
@@ -113,8 +113,23 @@ class Game {
             counter -= 1
             println(x2, y2)
         }
-        solveFloors
+        val solvedBuffer = Buffer[Floor]()
+        if (solveFloors.size <= labyrinthLocations.gridSize) {
+        val solved = solveFloors.filter(n => !((((solveFloors.map(m => m.location).contains((n.location._1 + 1, n.location._2))) | (solveFloors.map(m => m.location).contains((n.location._1 - 1, n.location._2)))) & solveFloors.map(m => m.location).contains((n.location._1, n.location._2 + 1)) & solveFloors.map(m => m.location).contains((n.location._1, n.location._2 - 1))) |
+          (((solveFloors.map(m => m.location).contains((n.location._1, n.location._2 + 1))) | (solveFloors.map(m => m.location).contains((n.location._1, n.location._2 - 1)))) & solveFloors.map(m => m.location).contains((n.location._1 + 1, n.location._2)) & solveFloors.map(m => m.location).contains((n.location._1 - 1, n.location._2)))))
+        //val solved2 = solved.filter(n => solved.map(m => m.location).contains((n.location._1 + 1, n.location._2)) | solved.map(m => m.location).contains((n.location._1 - 1, n.location._2)) | solved.map(m => m.location).contains((n.location._1, n.location._2 + 1)) | solved.map(m => m.location).contains((n.location._1, n.location._2 - 1)))
+        for (i <- solved) {
+            if (solveFloors.indexOf(i) > 0 & solveFloors.indexOf(i) < solveFloors.size - 1) {
+                if (solved.contains(solveFloors(solveFloors.indexOf(i) + 1)) & solved.contains(solveFloors(solveFloors.indexOf(i) - 1))) {
+                    solvedBuffer += i
+                }
+            }else solvedBuffer += i
 
+        }
+            labyrinthSolved = true
+        }else solvedBuffer.empty
 
+        solvedBuffer
     }
+
 }

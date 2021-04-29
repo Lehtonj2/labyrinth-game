@@ -10,10 +10,9 @@ import scalafx.scene.shape.Rectangle
 import scalafx.application.JFXApp
 import scalafx.beans.property.StringProperty
 import scalafx.scene.Scene
-import scalafx.scene.layout.{BorderPane, GridPane, VBox}
+import scalafx.scene.layout.{BorderPane, GridPane, Pane, VBox}
 import scalafx.event.ActionEvent
 import scalafx.scene.text.FontWeight
-
 import scala.collection.mutable.Buffer
 
 
@@ -34,10 +33,29 @@ object Main extends JFXApp {
     bottomBox.children += textInput
 
 
-    val root = new GridPane
+    val root = new GridPane {
+
+    }
 
     root.add(bottomBox, 1, 1)
+
     val menuScene = new Scene(root)
+
+    val menuBar = new MenuBar
+    val menu = new Menu("Game")
+    val startGame = new MenuItem("Start a new game")
+    val continue = new MenuItem("Continue current game")
+    val quit = new MenuItem("Quit")
+    val fileMenu = new Menu("Save/Load")
+    val saveGame = new MenuItem("Save current game")
+    val loadGame = new MenuItem("Load saved game")
+    menu.items = List(startGame, continue, quit)
+    fileMenu.items = List(saveGame, loadGame)
+    menuBar.menus = List(menu, fileMenu)
+    val rootPane = new BorderPane
+    rootPane.top = menuBar
+    root.add(rootPane, 0, 0)
+
 
     var newSize = 15
     def scale(size: Int):Double = {
@@ -55,7 +73,7 @@ object Main extends JFXApp {
     width = scale(newSize)
     height = scale(newSize)
     fill = Blue
-    if (i.underLap) fill = Gray
+    if (i.overLap) fill = Gray
     }
     floorRectangles += rectangle
 
@@ -309,16 +327,20 @@ object Main extends JFXApp {
               done()
             }
             case KeyCode.Space => {
-                  if (notYetSolved) { makeSolveRectangles()
+                  if (notYetSolved & !game.bridges.map(n =>(n._1, n._2)).contains((game.player.x, game.player.y))) {
+                  makeSolveRectangles()
                   drawSolver = true
                   if (playerHidden) {
             content = floorRectangles ++ wallRectangles ++ Buffer(exitRectangle) ++ solveRectangles
         } else {
             content = floorRectangles ++ wallRectangles ++ Buffer(exitRectangle) ++ solveRectangles ++ Buffer(playerRectangle)
         }
-                  notYetSolved = false
+                  if (game.labyrinthSolved) notYetSolved = false
 
                   }
+            }
+            case KeyCode.Escape => {
+                  stage.scene = menuScene
             }
             case _ =>
         }
@@ -327,7 +349,7 @@ object Main extends JFXApp {
       gameScene
     }
 
-    val menuBar = new MenuBar
+    /*val menuBar = new MenuBar
     val menu = new Menu("Menu")
     val startGame = new MenuItem("Start game")
     menu.items = List(startGame)
@@ -335,14 +357,15 @@ object Main extends JFXApp {
     val rootPane = new BorderPane
     rootPane.top = menuBar
     //this.menuScene.root = rootPane
-    root.add(rootPane, 0, 0)
+    root.add(rootPane, 0, 0)*/
     def updateNewSize(number: StringProperty) {
       if (number.value.nonEmpty & number.value.forall(n => n.isDigit)) {
         if (number.value.toInt <= 50 & number.value.toInt > 0) this.newSize = number.value.toInt else this.newSize = 50
       } else this.newSize = 10
     }
+    var gameStarted = false
     startGame.onAction = (ae: ActionEvent) => {
-
+      gameStarted = true
       updateNewSize(textInput.text)
       this.game.newGrid(newSize, newSize)
       this.game.newLabyrinth()
@@ -355,6 +378,17 @@ object Main extends JFXApp {
       this.makeWallRectangles()
       stage.scene = newGameScene
     }
+    continue.onAction = (ae: ActionEvent) => {
+      if (gameStarted) stage.scene = newGameScene
+    }
+    saveGame.onAction = (ae: ActionEvent) => {
+      if (gameStarted) this.game.fileManager.saveLabyrinth(this.game)
+    }
+    quit.onAction = (ae: ActionEvent) => {
+      sys.exit()
+    }
+
+
   stage.scene = menuScene
 
     }
