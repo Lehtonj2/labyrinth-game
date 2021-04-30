@@ -16,6 +16,7 @@ class Game {
     var player = new Character(15, 15)
     val fileManager = new FileManager
     var labyrinthSolved = false
+
     def newGrid(width: Int, height: Int) {
         grid = new Grid(width, height)
         gridLocations = grid.locations
@@ -108,7 +109,6 @@ class Game {
                 }
             }
 
-            //if (!walls.map(n => (n.location._1, n.location._2)).contains((x2, y2 - 1)) & labyrinthLocations.) {
             solveFloors += new Floor(x2, y2, false)
 
             counter -= 1
@@ -117,7 +117,7 @@ class Game {
         if (solveFloors.size <= labyrinthLocations.gridSize) {
         val solved = solveFloors.filter(n => !((((solveFloors.map(m => m.location).contains((n.location._1 + 1, n.location._2))) | (solveFloors.map(m => m.location).contains((n.location._1 - 1, n.location._2)))) & solveFloors.map(m => m.location).contains((n.location._1, n.location._2 + 1)) & solveFloors.map(m => m.location).contains((n.location._1, n.location._2 - 1))) |
           (((solveFloors.map(m => m.location).contains((n.location._1, n.location._2 + 1))) | (solveFloors.map(m => m.location).contains((n.location._1, n.location._2 - 1)))) & solveFloors.map(m => m.location).contains((n.location._1 + 1, n.location._2)) & solveFloors.map(m => m.location).contains((n.location._1 - 1, n.location._2)))))
-        //val solved2 = solved.filter(n => solved.map(m => m.location).contains((n.location._1 + 1, n.location._2)) | solved.map(m => m.location).contains((n.location._1 - 1, n.location._2)) | solved.map(m => m.location).contains((n.location._1, n.location._2 + 1)) | solved.map(m => m.location).contains((n.location._1, n.location._2 - 1)))
+
         for (i <- solved) {
             if (solveFloors.indexOf(i) > 0 & solveFloors.indexOf(i) < solveFloors.size - 1) {
                 if (solved.contains(solveFloors(solveFloors.indexOf(i) + 1)) & solved.contains(solveFloors(solveFloors.indexOf(i) - 1))) {

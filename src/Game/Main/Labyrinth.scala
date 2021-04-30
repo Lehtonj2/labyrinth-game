@@ -26,6 +26,8 @@ class Labyrinth {
     }
     walls
   }
+
+
   def createLabyrinth(grid: Grid) = {
     val labyrinthSize = grid.gridSize
     val drawFloors = Buffer[Floor]()
@@ -34,10 +36,14 @@ class Labyrinth {
     val firstCell = grid.locations(Random.nextInt(labyrinthSize))
     floorCells += firstCell
     visitedCells += firstCell
-    drawFloors += new Floor(firstCell._1 * 3, firstCell._2 * 3, false)
-    drawFloors += new Floor(firstCell._1 * 3 + 1, firstCell._2 * 3, false)
-    drawFloors += new Floor(firstCell._1 * 3, firstCell._2 * 3 + 1, false)
-    drawFloors += new Floor(firstCell._1 * 3 + 1, firstCell._2 * 3 + 1, false)
+    def addFloors(xy: (Int, Int)) {
+    drawFloors += new Floor(xy._1 * 3, xy._2 * 3, false)
+    drawFloors += new Floor(xy._1 * 3 + 1, xy._2 * 3, false)
+    drawFloors += new Floor(xy._1 * 3, xy._2 * 3 + 1, false)
+    drawFloors += new Floor(xy._1 * 3 + 1, xy._2 * 3 + 1, false)
+  }
+    addFloors(firstCell)
+
     while (floorCells.nonEmpty) {
       val next = floorCells.reverse.head
       val neighbours = grid.neighbours(next._1, next._2).filter(n => !visitedCells.contains(n._1)).filter(n => closeWalls(n._1._1, n._1._2, n._2).forall(n => !drawFloors.contains(new Floor(n._1, n._2, true))))
@@ -47,10 +53,8 @@ class Labyrinth {
           val neighbour = neighbours(Random.nextInt(neighbours.size))
           floorCells += neighbour._1
           visitedCells += neighbour._1
-          drawFloors += new Floor(neighbour._1._1 * 3, neighbour._1._2 * 3, false)
-          drawFloors += new Floor(neighbour._1._1 * 3 + 1, neighbour._1._2 * 3, false)
-          drawFloors += new Floor(neighbour._1._1 * 3, neighbour._1._2 * 3 + 1, false)
-          drawFloors += new Floor(neighbour._1._1 * 3 + 1, neighbour._1._2 * 3 + 1, false)
+
+          addFloors(neighbour._1)
           neighbour._2 match {
             case "N" => {
               drawFloors += new Floor(neighbour._1._1 * 3, neighbour._1._2 * 3 + 1 + 1, false)
@@ -74,10 +78,8 @@ class Labyrinth {
           val neighbours = grid.neighbours(neighbour._1._1, neighbour._1._2)
           floorCells += neighbour._1
           visitedCells += neighbour._1
-          drawFloors += new Floor(neighbour._1._1 * 3, neighbour._1._2 * 3, false)
-          drawFloors += new Floor(neighbour._1._1 * 3 + 1, neighbour._1._2 * 3, false)
-          drawFloors += new Floor(neighbour._1._1 * 3, neighbour._1._2 * 3 + 1, false)
-          drawFloors += new Floor(neighbour._1._1 * 3 + 1, neighbour._1._2 * 3 + 1, false)
+          addFloors(neighbour._1)
+
 
           neighbour._2 match {
             case "N" => {

@@ -8,10 +8,11 @@ import scalafx.scene.input.KeyEvent
 import scalafx.scene.paint.Color._
 import scalafx.scene.shape.Rectangle
 import scalafx.application.JFXApp
-import scalafx.beans.property.StringProperty
+import scalafx.beans.property.{DoubleProperty, StringProperty}
 import scalafx.scene.Scene
 import scalafx.scene.layout.{BorderPane, GridPane, VBox}
 import scalafx.event.ActionEvent
+
 import scala.collection.mutable.Buffer
 
 
@@ -54,6 +55,7 @@ object Main extends JFXApp {
     val rootPane = new BorderPane
     rootPane.top = menuBar
     root.add(rootPane, 0, 0)
+    stage.scene = menuScene
 
 
     def scale(size: Int):Double = {
@@ -168,166 +170,79 @@ object Main extends JFXApp {
         }
     }
 
+      def movePlayer(x: Int, y: Int, z: Int, playerInt: Int, recDouble: DoubleProperty, dir1: String, dir2: String, dir3: String, dir4: String, bdir1: String, locationx: Boolean) {
+        var player = playerInt
+        var rectangle = recDouble.value
+        if (!game.walls.map(n => n.location).contains((game.player.x + x, game.player.y + y)) & game.labyrinthLocations.locations.map(n => (n._1, n._2)).contains((game.player.x + x, game.player.y + y))) {
+                    if (!game.bridges.map(n => (n._1, n._2)).contains((game.player.x + x, game.player.y + y)) & !onBridge) {
+                        player += z
+                        rectangle = rectangle + z * scale(newSize)
+                    } else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x + x, game.player.y + y, dir1)) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x + x, game.player.y + y, dir2))) & !onBridge) {
+                        player += z
+                        rectangle = rectangle + z * scale(newSize)
+                        fromDirection = bdir1
+                        onBridge = true
+                    }else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x + x, game.player.y + y, dir3)) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x + x, game.player.y + y, dir4))) & !onBridge) {
+                        player += z
+                        rectangle = rectangle + z * scale(newSize)
+                        fromDirection = bdir1
+                        onBridge = true
+                        hidePlayer(true)
+                        println("noooo")
+                    } else if (game.bridges.map(n => (n._1, n._2)).contains((game.player.x + x, game.player.y + y))) {
+                        if (game.bridges.filter(n => (n._1 == game.player.x) & n._2 == game.player.y).map(n => n._3).head == game.bridges.filter(n => (n._1 == game.player.x + x) & n._2 == game.player.y + y).map(n => n._3).head) {
+                            player += z
+                            rectangle = rectangle + z * scale(newSize)
+                            onBridge = true
+                        }  else if ((fromDirection == bdir1)) {
+                            player += z
+                            rectangle = rectangle + z * scale(newSize)
+                            fromDirection = bdir1
+                            onBridge = true
+                            hidePlayer(!playerHidden)
+                        }
+                    }else if ((fromDirection == bdir1)) {
+                        player += z
+                        rectangle = rectangle + z * scale(newSize)
+                        onBridge = false
+                        hidePlayer(false)
+                    }
+                    if (locationx) {
+                      game.player.x = player
+                      playerRectangle.x = rectangle
+                    }else{
+                      game.player.y = player
+                      playerRectangle.y = rectangle
+
+
+
+            }
+              done()
+            }
+      }
+
 
 
 
     onKeyPressed = (ke: KeyEvent) => {
         ke.code match {
             case KeyCode.Up => {
-                if (!game.walls.map(n => n.location).contains((game.player.x, game.player.y - 1)) & game.labyrinthLocations.locations.map(n => (n._1, n._2)).contains((game.player.x, game.player.y - 1))) {
-                    if (!game.bridges.map(n => (n._1, n._2)).contains((game.player.x, game.player.y - 1)) & !onBridge) {
-                        game.player.y -= 1
-                        playerRectangle.y = playerRectangle.y() - scale(newSize)
-                    } else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y - 1, "N")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y - 1, "S"))) & !onBridge) {
-                        game.player.y -= 1
-                        playerRectangle.y = playerRectangle.y() - scale(newSize)
-                        fromDirection = "v"
-                        onBridge = true
-                    }else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y - 1, "W")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y - 1, "E"))) & !onBridge) {
-                        game.player.y -= 1
-                        playerRectangle.y = playerRectangle.y() - scale(newSize)
-                        fromDirection = "v"
-                        onBridge = true
-                        hidePlayer(true)
-                    } else if (game.bridges.map(n => (n._1, n._2)).contains((game.player.x, game.player.y - 1))) {
-                        if (game.bridges.filter(n => (n._1 == game.player.x) & n._2 == game.player.y).map(n => n._3).head == game.bridges.filter(n => (n._1 == game.player.x) & n._2 == game.player.y - 1).map(n => n._3).head) {
-                            game.player.y -= 1
-                            playerRectangle.y = playerRectangle.y() - scale(newSize)
-                            onBridge = true
-                        }  else if ((fromDirection == "v")) {
-                            game.player.y -= 1
-                            playerRectangle.y = playerRectangle.y() - scale(newSize)
-                            fromDirection = "v"
-                            onBridge = true
-                            hidePlayer(!playerHidden)
-                        }
-                    }else if ((fromDirection == "v")) {
-                        game.player.y -= 1
-                        playerRectangle.y = playerRectangle.y() - scale(newSize)
-                        onBridge = false
-                        hidePlayer(false)
-                    }
 
-
-            }
-              done()
+              movePlayer(0, -1, -1, game.player.y, playerRectangle.y, "N", "S", "W", "E", "v", false)
             }
 
 
             case KeyCode.Down => {
-                if (!game.walls.map(n => n.location).contains((game.player.x, game.player.y + 1)) & game.labyrinthLocations.locations.map(n => (n._1, n._2)).contains((game.player.x, game.player.y + 1))) {
-                    if (!game.bridges.map(n => (n._1, n._2)).contains((game.player.x, game.player.y + 1)) & !onBridge) {
-                        game.player.y += 1
-                        playerRectangle.y = playerRectangle.y() + scale(newSize)
-                    } else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y + 1, "N")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y + 1, "S"))) & !onBridge) {
-                        game.player.y += 1
-                        playerRectangle.y = playerRectangle.y() + scale(newSize)
-                        fromDirection = "v"
-                        onBridge = true
-                    }else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y + 1, "W")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x, game.player.y + 1, "E"))) & !onBridge) {
-                        game.player.y += 1
-                        playerRectangle.y = playerRectangle.y() + scale(newSize)
-                        fromDirection = "v"
-                        onBridge = true
-                        hidePlayer(true)
-                    } else if (game.bridges.map(n => (n._1, n._2)).contains((game.player.x, game.player.y + 1))) {
-                        if (game.bridges.filter(n => (n._1 == game.player.x) & n._2 == game.player.y).map(n => n._3).head == game.bridges.filter(n => (n._1 == game.player.x) & n._2 == game.player.y + 1).map(n => n._3).head) {
-                            game.player.y += 1
-                            playerRectangle.y = playerRectangle.y() + scale(newSize)
-                            onBridge = true
-                        } else if ((fromDirection == "v")) {
-                            game.player.y += 1
-                            playerRectangle.y = playerRectangle.y() + scale(newSize)
-                            fromDirection = "v"
-                            onBridge = true
-                            hidePlayer(!playerHidden)
-                        }
-                    }else if ((fromDirection == "v")) {
-                        game.player.y += 1
-                        playerRectangle.y = playerRectangle.y() + scale(newSize)
-                        onBridge = false
-                        hidePlayer(false)
-                    }
 
-
-            }
-              done()
+              movePlayer(0, 1, 1, game.player.y, playerRectangle.y, "N", "S", "W", "E", "v", false)
             }
             case KeyCode.Left => {
-                if (!game.walls.map(n => n.location).contains((game.player.x - 1, game.player.y)) & game.labyrinthLocations.locations.map(n => (n._1, n._2)).contains((game.player.x - 1, game.player.y))) {
-                    if (!game.bridges.map(n => (n._1, n._2)).contains((game.player.x - 1, game.player.y)) & !onBridge) {
-                        game.player.x -= 1
-                        playerRectangle.x = playerRectangle.x() - scale(newSize)
-                    } else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x - 1, game.player.y, "N")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x - 1, game.player.y, "S"))) & !onBridge) {
-                        game.player.x -= 1
-                        playerRectangle.x = playerRectangle.x() - scale(newSize)
-                        fromDirection = "h"
-                        onBridge = true
-                        hidePlayer(true)
-                    }else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x - 1, game.player.y, "W")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x - 1, game.player.y, "E"))) & !onBridge) {
-                        game.player.x -= 1
-                        playerRectangle.x = playerRectangle.x() - scale(newSize)
-                        fromDirection = "h"
-                        onBridge = true
-                    }else if (game.bridges.map(n => (n._1, n._2)).contains((game.player.x - 1, game.player.y))) {
-                        if (game.bridges.filter(n => (n._1 == game.player.x) & n._2 == game.player.y).map(n => n._3).head == game.bridges.filter(n => (n._1 == game.player.x - 1) & n._2 == game.player.y).map(n => n._3).head) {
-                            game.player.x -= 1
-                            playerRectangle.x = playerRectangle.x() - scale(newSize)
-                            onBridge = true
-                        }  else if ((fromDirection == "h")) {
-                            game.player.x -= 1
-                            playerRectangle.x = playerRectangle.x() - scale(newSize)
-                            fromDirection = "h"
-                            onBridge = true
-                            hidePlayer(!playerHidden)
-                        }
 
-                    }else if (fromDirection == "h") {
-                        game.player.x -= 1
-                        playerRectangle.x = playerRectangle.x() - scale(newSize)
-                        onBridge = false
-                        hidePlayer(false)
-                    }
-                }
-              done()
+              movePlayer(-1, 0, -1,  game.player.x, playerRectangle.x, "W", "E", "N", "S", "h", true)
             }
             case KeyCode.Right => {
-                if (!game.walls.map(n => n.location).contains((game.player.x + 1, game.player.y)) & game.labyrinthLocations.locations.map(n => (n._1, n._2)).contains((game.player.x + 1, game.player.y))) {
-                    if (!game.bridges.map(n => (n._1, n._2)).contains((game.player.x + 1, game.player.y)) & !onBridge) {
-                        game.player.x += 1
-                        playerRectangle.x = playerRectangle.x() + scale(newSize)
-                    } else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x + 1, game.player.y, "N")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x + 1, game.player.y, "S"))) & !onBridge) {
-                        game.player.x += 1
-                        playerRectangle.x = playerRectangle.x() + scale(newSize)
-                        fromDirection = "h"
-                        onBridge = true
-                        hidePlayer(true)
-                    }else if ((game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x + 1, game.player.y, "W")) | game.bridges.map(n => (n._1, n._2, n._3)).contains((game.player.x + 1, game.player.y, "E"))) & !onBridge) {
-                        game.player.x += 1
-                        playerRectangle.x = playerRectangle.x() + scale(newSize)
-                        fromDirection = "h"
-                        onBridge = true
-                    }else if (game.bridges.map(n => (n._1, n._2)).contains((game.player.x + 1, game.player.y))) {
-                        if (game.bridges.filter(n => (n._1 == game.player.x) & n._2 == game.player.y).map(n => n._3).head == game.bridges.filter(n => (n._1 == game.player.x + 1) & n._2 == game.player.y).map(n => n._3).head) {
-                            game.player.x += 1
-                            playerRectangle.x = playerRectangle.x() + scale(newSize)
-                            onBridge = true
-                        }  else if ((fromDirection == "h")) {
-                            game.player.x += 1
-                            playerRectangle.x = playerRectangle.x() + scale(newSize)
-                            fromDirection = "h"
-                            onBridge = true
-                            hidePlayer(!playerHidden)
-                        }
 
-                    }else if (fromDirection == "h") {
-                        game.player.x += 1
-                        playerRectangle.x = playerRectangle.x() + scale(newSize)
-                        onBridge = false
-                        hidePlayer(false)
-                    }
-                }
-              done()
+              movePlayer(1, 0, 1, game.player.x, playerRectangle.x, "W", "E", "N", "S", "h", true)
             }
             case KeyCode.Space => {
                   if (notYetSolved & !game.bridges.map(n =>(n._1, n._2)).contains((game.player.x, game.player.y))) {
@@ -404,9 +319,6 @@ object Main extends JFXApp {
     quit.onAction = (ae: ActionEvent) => {
       sys.exit()
     }
-
-
-  stage.scene = menuScene
 
     }
 
