@@ -8,10 +8,10 @@ import scala.collection.mutable.Buffer
 import scala.io.Source
 class FileManager {
   def saveLabyrinth(game: Game) {
-    val writer = new PrintWriter(new File("SaveFile.txt"))
+    val writer = new PrintWriter(new File("SaveFile.txt")) //writes to a file
     writer.write("")
     writer.write(s"${game.size}\n")
-    for (i <- game.floors) {
+    for (i <- game.floors) { //For each location of floors
     val location1 = i.location._1.toString
     val location2 = i.location._2.toString
     val lap = i.overLap.toString
@@ -27,8 +27,8 @@ class FileManager {
   }
 
   def loadLabyrinth(game: Game) = {
-    val floors = Buffer[Floor]()
-    val bridges = Buffer[(Int, Int, String)]()
+    val floors = Buffer[Floor]() //Stores loaded floors.
+    val bridges = Buffer[(Int, Int, String)]() //Stores loaded bridge-locations.
     var size = 0
     val test = Source.fromFile("SaveFile.txt")
       var currentX = 0

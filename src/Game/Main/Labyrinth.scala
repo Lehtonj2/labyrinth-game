@@ -3,8 +3,8 @@ import scala.collection.mutable.Buffer
 import scala.util.Random
 
 class Labyrinth {
-  val bridgeLocations = Buffer[(Int, Int, String)]()
-  def closeWalls(x: Int, y: Int, dir: String) = {
+  val bridgeLocations = Buffer[(Int, Int, String)]() //For storing bridge-locations.
+  def closeWalls(x: Int, y: Int, dir: String) = { //Checks walls close to a location.
     val walls = Buffer[(Int, Int)]()
     dir match {
       case "N" => {
@@ -28,7 +28,7 @@ class Labyrinth {
   }
 
 
-  def createLabyrinth(grid: Grid) = {
+  def createLabyrinth(grid: Grid) = { //Randomly creates a new labyrinth. Returns a value for floors. Stores bridge-locations into a variable in this class.
     val labyrinthSize = grid.gridSize
     val drawFloors = Buffer[Floor]()
     val visitedCells = Buffer[(Int, Int)]()

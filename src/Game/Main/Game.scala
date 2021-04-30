@@ -5,7 +5,7 @@ import scala.collection.mutable.Buffer
 
 
 class Game {
-    var size = 10
+    var size = 10 //default values for variables
     var grid = new Grid(10, 10)
     var gridLocations = grid.locations
     var labyrinth = new Labyrinth
@@ -17,11 +17,11 @@ class Game {
     val fileManager = new FileManager
     var labyrinthSolved = false
 
-    def newGrid(width: Int, height: Int) {
+    def newGrid(width: Int, height: Int) { //Creates a new grid.
         grid = new Grid(width, height)
         gridLocations = grid.locations
     }
-    def newLabyrinth() {
+    def newLabyrinth() { //Creates new values for variables.
         labyrinth = new Labyrinth
         floors = labyrinth.createLabyrinth(grid)
         bridges = labyrinth.bridgeLocations
@@ -29,7 +29,7 @@ class Game {
         walls = new Grid((grid.width * 3 - 1), (grid.height * 3 - 1)).locations.filter(n => !floors.map(_.location).contains(n)).map(n => new Wall(n._1, n._2, false))
         player = new Character(grid.width + (grid.width / 2), grid.height + (grid.height / 2))
     }
-    def solveLabyrinth(x: Int, y: Int) = {
+    def solveLabyrinth(x: Int, y: Int) = { // Solves the current labyrinth for the player.
         var x2 = x
         var y2 = y
         val solveFloors = Buffer[Floor]()
@@ -114,7 +114,7 @@ class Game {
             counter -= 1
         }
         val solvedBuffer = Buffer[Floor]()
-        if (solveFloors.size <= labyrinthLocations.gridSize) {
+        if (solveFloors.size <= labyrinthLocations.gridSize) { //Removes parts that shouldn't be displayed.
         val solved = solveFloors.filter(n => !((((solveFloors.map(m => m.location).contains((n.location._1 + 1, n.location._2))) | (solveFloors.map(m => m.location).contains((n.location._1 - 1, n.location._2)))) & solveFloors.map(m => m.location).contains((n.location._1, n.location._2 + 1)) & solveFloors.map(m => m.location).contains((n.location._1, n.location._2 - 1))) |
           (((solveFloors.map(m => m.location).contains((n.location._1, n.location._2 + 1))) | (solveFloors.map(m => m.location).contains((n.location._1, n.location._2 - 1)))) & solveFloors.map(m => m.location).contains((n.location._1 + 1, n.location._2)) & solveFloors.map(m => m.location).contains((n.location._1 - 1, n.location._2)))))
 
